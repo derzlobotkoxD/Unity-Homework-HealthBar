@@ -21,11 +21,7 @@ public class Health : MonoBehaviour
         if (damage <= 0)
             return;
 
-        if (CurrentHealthPoints - damage < 0)
-            CurrentHealthPoints = 0;
-        else
-            CurrentHealthPoints -= damage;
-
+        CurrentHealthPoints = Mathf.Clamp(CurrentHealthPoints - damage, 0, _maxHealthPoints);
         Changed?.Invoke();
     }
 
@@ -34,11 +30,7 @@ public class Health : MonoBehaviour
         if (health <= 0)
             return;
 
-        if (CurrentHealthPoints + health > _maxHealthPoints)
-            CurrentHealthPoints = _maxHealthPoints;
-        else
-            CurrentHealthPoints += health;
-
+        CurrentHealthPoints = Mathf.Clamp(CurrentHealthPoints + health, 0, _maxHealthPoints);
         Changed?.Invoke();
     }
 }

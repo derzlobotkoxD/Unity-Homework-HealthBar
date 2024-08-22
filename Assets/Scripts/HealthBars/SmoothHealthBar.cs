@@ -1,28 +1,13 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.UI;
 
-public class SmoothHealthBar : MonoBehaviour
+public class SmoothHealthBar : HealthBar
 {
-    [SerializeField] private Slider _slider;
-    [SerializeField] private Health _health;
-    [SerializeField] private float _speedChanging;
+    [SerializeField] private float _accelerationCoefficient = 2;
 
     private Coroutine _coroutine;
 
-    private void Start()
-    {
-        _slider.maxValue = _health.MaxHealthPoints;
-        _slider.value = _health.CurrentHealthPoints;
-    }
-
-    private void OnEnable() =>
-        _health.Changed += Change;
-
-    private void OnDisable() =>
-        _health.Changed -= Change;
-
-    private void Change()
+    protected override void Change()
     {
         if (_coroutine != null)
             StopCoroutine(_coroutine);
@@ -32,10 +17,16 @@ public class SmoothHealthBar : MonoBehaviour
 
     private IEnumerator SmoothChange()
     {
-        while(_slider.value != _health.CurrentHealthPoints)
+        float currentValue = _slider.value;
+        float nextValue = Health.CurrentHealthPoints / Health.MaxHealthPoints;
+        float time = 0;
+
+        while(_slider.value != nextValue)
         {
-            _slider.value = Mathf.MoveTowards(_slider.value, _health.CurrentHealthPoints, _speedChanging * Time.deltaTime);
-            yield return new WaitForEndOfFrame();
+            time += _accelerationCoefficient * Time.deltaTime;
+            _slider.value = Mathf.Lerp(currentValue, nextValue, time);
+
+            yield return null;
         }
     }
 }
